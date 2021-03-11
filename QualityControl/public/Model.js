@@ -14,7 +14,9 @@
 
 /* global JSROOT */
 
-import {sessionService, Observable, WebSocketClient, QueryRouter, Loader, Notification} from '/js/src/index.js';
+import {
+  sessionService, Observable, WebSocketClient, QueryRouter, Loader, Notification, RemoteData
+} from '/js/src/index.js';
 
 import Layout from './layout/Layout.js';
 import QCObject from './object/QCObject.js';
@@ -32,7 +34,8 @@ export default class Model extends Observable {
   constructor() {
     super();
 
-    this.ccdbPlotUrl = 'localhost/ccdb'    
+    this.ccdbPlotUrl = 'localhost/ccdb'
+    this.oldVersion = RemoteData.notAsked();
     this.session = sessionService.get();
     this.session.personid = parseInt(this.session.personid, 10); // cast, sessionService has only strings
 
@@ -84,6 +87,7 @@ export default class Model extends Observable {
     this.layout.loadMyList();
     this.checkOnlineModeAvailability();
     this.configureJSRoot();
+    this.configureOldVersion();
   }
 
   /**
@@ -274,5 +278,20 @@ export default class Model extends Observable {
 
     JSROOT.settings.fFrameLineColor = 16;
     this.ccdbPlotUrl = await this.object.qcObjectService.getCcdbPlotUrl();
+    this.notify();
+  }
+
+  /**
+   * Asks server for an URL of old QCG version;
+   * If provided, a button will be displayed on the header to access old version
+   */
+  async configureOldVersion() {
+    const {ok, result} = await this.loader.get('/api/oldversion');
+    if (ok) {
+      this.oldVersion = RemoteData.success(result.url);
+    } else {
+      return RemoteData.failure();
+    }
+    this.notify();
   }
 }

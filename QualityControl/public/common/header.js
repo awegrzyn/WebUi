@@ -58,11 +58,26 @@ const headerSpecific = (model) => {
 const commonHeader = (model) => h('.flex-grow', [
   loginButton(model),
   ' ',
+  oldVersionButton(model),
+  ' ',
   onlineButton(model),
   ' ',
   h('span.f4.gray', 'Quality Control'),
   model.loader.active && h('span.f4.mh1.gray', spinner())
 ]);
+
+/**
+ * Dispaly a button to redirect user to old QCG version
+ * @param {Object} model 
+ * @returns 
+ */
+const oldVersionButton = (model) =>
+  model.oldVersion.isSuccess() &&
+  h('a.ph2', {
+    title: 'Go to older version of QCG',
+    href: model.oldVersion.payload,
+    target: '_blank'
+  }, h('button.btn.primary', 'QCG v1'));
 
 /**
  * Shows profile button to logout or check who is the current owner of session

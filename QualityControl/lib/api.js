@@ -30,6 +30,9 @@ module.exports.setup = (http) => {
   http.get('/listOnlineObjects', listOnlineObjects);
   http.get('/isOnlineModeConnectionAlive', isOnlineModeConnectionAlive);
   http.get('/ccdbPlotUrl', (req, res) => res.status(200).json({url: config.ccdb.plotUrl || 'localhost:8080/ccdb'}));
+  http.get('/oldversion', (req, res) => config.http.oldversion
+    ? res.status(200).json({url: config.http.oldversion})
+    : res.sendStatus(404));
   http.post('/readLayout', model.layoutConnector.readLayout.bind(model.layoutConnector));
   http.post('/writeLayout', model.layoutConnector.updateLayout.bind(model.layoutConnector));
   http.post('/listLayouts', model.layoutConnector.listLayouts.bind(model.layoutConnector));
