@@ -43,13 +43,17 @@ jobs:
     outputs:
       ASSET_URL: ${{ steps.upload.outputs.asset_url }}
     steps:
+    - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
-    - run: npm install
+    - name: Install production deps
+      run: npm install --only=production
+      working-directory: ${{ needs.deploy-npm-module.outputs.PROJECT }}
     - name: Create package tarball
-      run:  cd ${{ needs.deploy-npm-module.outputs.PROJECT }} && echo ::set-output name=tgz_name::$(npm pack)
+      run:  echo ::set-output name=tgz_name::$(npm pack)
+      working-directory: ${{ needs.deploy-npm-module.outputs.PROJECT }}
       id: tgz
     - name: Upload tarball to release assets
       uses: actions/upload-release-asset@v1
