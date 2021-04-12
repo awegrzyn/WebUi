@@ -50,8 +50,9 @@ jobs:
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
+    - run: npm install
     - name: Create package tarball
-      run: echo ::set-output name=tgz_name::$(npm pack ${GITHUB_REF/refs\/tags\/} -s)
+      run:  cd ${{ needs.deploy-npm-module.outputs.PROJECT }} && echo ::set-output name=tgz_name::$(npm pack)
       id: tgz
     - name: Upload tarball to release assets
       uses: actions/upload-release-asset@v1
@@ -61,7 +62,7 @@ jobs:
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_content_type: application/tar+gzip
-        asset_path: ./${{ steps.tgz.outputs.tgz_name }}
+        asset_path: ./${{ needs.deploy-npm-module.outputs.PROJECT }}/${{ steps.tgz.outputs.tgz_name }}
         asset_name: ${{ steps.tgz.outputs.tgz_name }}
     - name: Set output
       run: echo ::set-output name=asset_url::${{ steps.upload.browser_download_url }}
